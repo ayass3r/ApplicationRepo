@@ -1,0 +1,31 @@
+Tutorama Task
+1. 
+
+Since the data received from Github is dynamic, we cannot simply test the functionality 
+of the code by comparing it to an expected output (since that expected output will be changed
+ dynamically). One way to overcome this is to run the code on a sample input of repos that was 
+pre downloaded before for which the correct statistics are known. We then compare the table generated 
+by the code with the expected correct table. This is not live testing though.
+
+
+
+2. The github API supports several query parameters. For instance, in the current implementation,
+the date is set to 3 month prior to this date, and hence we use the query: q=created:>=YYYY-MM-DD
+to specify the date. However, in the case of date ranges, we can implement it as:
+q=created:>=DATE1 and q=created:<=DATE2 such that the repositories are within DATE1 and DATE2.
+Note that DATE1 and DATE2 should be of the form YYYY-MM-DD.
+
+
+
+
+3. 
+
+The API takes the argument 'per_page' which is currently set to 100 repositories returned.
+If we wanted to return instead the top say 200, we would use pagination. Pagination is supported
+by Github by adding the argument ?page=x for the xth page. So, we would get the results from
+?page=1 and ?page=2, concatenate them, and treat this as the fetched repos that we perform the
+operations on. If 300 for example, we would concatenate the results of ?page=1, ?page=2, ?page=3
+and work on them and so on. We should take care on the processing time because processing JSONS
+of this size might take a lot of time, so we should limit this number.
+The special considerations here is that we will have to perform x/100 calls first to get all the
+valid repositories before starting to calculate the statistics for them.

@@ -1,0 +1,107 @@
+<html>
+<head>
+<!--
+JQuery for AJAX Calls
+Momentjs for Date manipulation
+-->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.3/moment.min.js"></script><!-- Latest compiled and minified CSS -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+<title>Tutorama Task</title>
+</head>
+
+<body>
+  </br>
+  <h2>Tutorama Task</h2>
+  <div class="container">
+    <table id="langTable" class="table table-striped" style=“display:none”>
+      <tr>
+      	<th>Language</th>
+        <th>Number of Repos</th>
+        <th>Average Stars</th>
+        <th>Average Forks</th>
+      </tr>
+    </table>
+  </br></br></br>
+  <p id="memo"></p>
+  <p id="hidden"></p>
+  </div>
+
+
+<button type="button" class="btn btn-primary center-block">Invoke Service</button>
+
+<script>
+$(document).ready(function(){
+  $("button").click(function(){
+    //First of all, delete any rows in table just in case the service has been invoked twice
+    table = document.getElementById("langTable");
+    while(table.rows.length > 1) {
+        table.deleteRow(1);
+    }
+
+    //Now calculate the correct date using momentjs
+    var CorrectStartDate = moment(new Date()).subtract(90, "days").format('YYYY-MM-DD');
+
+    //Construct API url with arguments
+    url = "https://api.github.com/search/repositories?sort=stars&order=desc&q=created:>=" + CorrectStartDate + "&per_page=100"
+
+    //JQuery Get request
+    $.get(url, function(data, status){
+      languages = {}; //stores list of all languages in top 100 repos
+      numRepos = {}; //stores total number of repos for each of the languages
+      totalStars = {}; //stores total number of stars for each of the languages
+      totalForks = {}; //stores total number of forks for each of the langyages
+
+      //First Calculate the required data we need and store it in the dictionaries
+      for (var i=0; i< data["items"].length ; i++){
+        item = data["items"][i];
+        if (item["language"] in languages){
+          //Found in languages dictionary, so just update the dictionaries
+          numRepos[item["language"]]++;
+          totalStars[item["language"]]+=item["stargazers_count"];
+          totalForks[item["language"]]+=item["forks_count"];
+        }
+        else{
+          //not found, make a new entry in the 4 dictionaries
+          languages[item["language"]]=item["language"];
+          numRepos[item["language"]] = 1;
+          totalStars[item["language"]]=item["stargazers_count"];
+          totalForks[item["language"]]=item["forks_count"];
+        }
+      }
+
+      //Now populate table with required data
+      for (language in languages){
+        //table is the actual html table
+        var table = document.getElementById("langTable");
+
+        //inserting a row
+        var row = table.insertRow(1);
+
+        //Get reference to each of the 4 cells
+        var lang = row.insertCell(0);
+        var num_of_repos = row.insertCell(1);
+        var avg_stars = row.insertCell(2);
+        var avg_forks = row.insertCell(3);
+
+        //Check if language is null, if it is then add it as NLSI_API
+        if (languages[language]==null){
+          lang.innerHTML = "NLSI_API(*)"
+        }
+        else {
+          lang.innerHTML = languages[language];
+          document.getElementById("hidden").innerHTML = "(*) NLSI_API=No Language Specified In API (Field is Null)"
+          document.getElementById("memo").innerHTML = "Figures rounded to two Decimal places"
+        }
+        num_of_repos.innerHTML = numRepos[language];
+        avg_stars.innerHTML = (totalStars[language]/numRepos[language]).toFixed(2); //Average, 2dp
+        avg_forks.innerHTML = (totalForks[language]/numRepos[language]).toFixed(2); //Average, 2dp
+      }
+    });
+  });
+});
+</script>
+</body>
+</html>
