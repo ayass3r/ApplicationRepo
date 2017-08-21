@@ -10,6 +10,57 @@ Momentjs for Date manipulation
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 
 <title>Tutorama Task</title>
+
+<style>
+/* Center the loader */
+#loader {
+  display: none;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 1;
+  width: 150px;
+  height: 150px;
+  margin: -75px 0 0 -75px;
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid #3498db;
+  width: 120px;
+  height: 120px;
+  -webkit-animation: spin 2s linear infinite;
+  animation: spin 2s linear infinite;
+}
+
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Add animation to "page content" */
+.animate-bottom {
+  position: relative;
+  -webkit-animation-name: animatebottom;
+  -webkit-animation-duration: 1s;
+  animation-name: animatebottom;
+  animation-duration: 1s
+}
+
+@-webkit-keyframes animatebottom {
+  from { bottom:-100px; opacity:0 }
+  to { bottom:0px; opacity:1 }
+}
+
+@keyframes animatebottom {
+  from{ bottom:-100px; opacity:0 }
+  to{ bottom:0; opacity:1 }
+}
+
+</style>
 </head>
 
 <body>
@@ -25,16 +76,22 @@ Momentjs for Date manipulation
       </tr>
     </table>
   </br></br></br>
+  <div id="loader"></div>
   <p id="memo"></p>
   <p id="hidden"></p>
   </div>
 
 
-<button type="button" class="btn btn-primary center-block">Invoke Service</button>
+<button id="invoke" type="button" class="btn btn-primary center-block">Invoke Service</button>
 
 <script>
 $(document).ready(function(){
   $("button").click(function(){
+    //Hide Button
+    document.getElementById('invoke').style.visibility = 'hidden';
+    document.getElementById("loader").style.display = "block";
+
+
     //First of all, delete any rows in table just in case the service has been invoked twice
     table = document.getElementById("langTable");
     while(table.rows.length > 1) {
@@ -99,6 +156,11 @@ $(document).ready(function(){
         avg_stars.innerHTML = (totalStars[language]/numRepos[language]).toFixed(2); //Average, 2dp
         avg_forks.innerHTML = (totalForks[language]/numRepos[language]).toFixed(2); //Average, 2dp
       }
+
+      //Show button again
+      document.getElementById('invoke').style.visibility = 'visible';
+      document.getElementById("loader").style.display = "none";
+
     });
   });
 });
